@@ -1,0 +1,62 @@
+# CP5401 Practical 05
+# Expressions and Contexts
+
+name: Practical 05 - Expressions and Contexts
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      show_details:
+        description: 'Show additional workflow details'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  COURSE_NAME: CP5401
+
+jobs:
+  expressions_demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Display GitHub Context
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Branch reference: ${{ github.ref }}"
+
+      - name: Display Runner and Environment Context
+        run: |
+          echo "Runner operating system: ${{ runner.os }}"
+          echo "Course: ${{ env.COURSE_NAME }}"
+
+      - name: Main Branch Conditional Step
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "This workflow is running on the main branch."
+
+      - name: Contains Function Example
+        if: ${{ contains(github.ref, 'main') }}
+        run: echo "The branch reference contains the word main."
+
+      - name: Manual Input Example
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.show_details }}
+        run: |
+          echo "The workflow was manually triggered."
+          echo "Additional workflow details were requested."
+
+      - name: Previous Steps Successful
+        if: ${{ success() }}
+        run: echo "All previous required steps completed successfully."
+
+      - name: Run Only After Failure
+        if: ${{ failure() }}
+        run: echo "A previous step failed."
+
+      - name: Always Run Final Step
+        if: ${{ always() }}
+        run: echo "This final step runs regardless of the previous status."
